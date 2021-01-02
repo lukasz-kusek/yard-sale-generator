@@ -6,8 +6,13 @@ source_dir = '../yard-sale'
 destination_dir = '../yard-sale-html'
 
 if os.path.isdir(destination_dir):
-    rmtree(destination_dir)
-os.mkdir(destination_dir)
+    for content in os.listdir(destination_dir):
+        if not content.startswith(".") and os.path.isdir(destination_dir + "/" + content):
+            rmtree(destination_dir + "/" + content)
+        if content.endswith(".html"):
+            os.remove(destination_dir + "/" + content)
+else:
+    os.mkdir(destination_dir)
 
 items = os.listdir(source_dir)
 items_with_details = []
