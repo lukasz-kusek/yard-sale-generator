@@ -29,28 +29,29 @@ for item in sorted(items):
             copyfile(source_dir + "/" + item + "/" + detail, destination_dir + "/" + item + "/" + detail)
             photos.append(item + "/" + detail)
 
-    with open('item.html.mustache', 'r') as item_html_template:
-        with open(destination_dir + '/' + item + '.html', 'w') as item_html:
-            with open(source_dir + "/" + item + "/Opis_exports/Opis.txt", 'r') as opis_txt:
-                with open(source_dir + "/" + item + "/Cena_exports/Cena.txt", 'r') as cena_txt:
-                    cena = cena_txt.read().strip()
-                    html = chevron.render(item_html_template, {
-                        'name': item,
-                        'price': cena,
-                        'description': opis_txt.readlines(),
-                        'photos': photos})
+    if os.path.isfile(source_dir + "/" + item + "/Opis_exports/Opis.txt") and os.path.isfile(source_dir + "/" + item + "/Cena_exports/Cena.txt"):
+        with open('item.html.mustache', 'r') as item_html_template:
+            with open(destination_dir + '/' + item + '.html', 'w') as item_html:
+                with open(source_dir + "/" + item + "/Opis_exports/Opis.txt", 'r') as opis_txt:
+                    with open(source_dir + "/" + item + "/Cena_exports/Cena.txt", 'r') as cena_txt:
+                        cena = cena_txt.read().strip()
+                        html = chevron.render(item_html_template, {
+                            'name': item,
+                            'price': cena,
+                            'description': opis_txt.readlines(),
+                            'photos': photos})
 
-                    items_with_details.append({
-                        'name': item,
-                        'price': cena,
-                        'photo': photos[0]
-                    })
+                        items_with_details.append({
+                            'name': item,
+                            'price': cena,
+                            'photo': photos[0]
+                        })
 
-                    cena_txt.close()
-                opis_txt.close()
-            item_html.write(html)
-            item_html.close()
-        item_html_template.close()
+                        cena_txt.close()
+                    opis_txt.close()
+                item_html.write(html)
+                item_html.close()
+            item_html_template.close()
 
 with open('index.html.mustache', 'r') as index_html_template:
     with open(destination_dir + '/index.html', 'w') as index_html:
