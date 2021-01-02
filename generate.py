@@ -58,3 +58,10 @@ with open('index.html.mustache', 'r') as index_html_template:
         index_html.write(html)
         index_html.close()
     index_html_template.close()
+
+with open('post.html.mustache', 'r') as post_html_template:
+    with open(destination_dir + '/post.html', 'w') as post_html:
+        html = chevron.render(post_html_template, {'items': items_with_details})
+        post_html.write(html)
+        post_html.close()
+    post_html_template.close()
