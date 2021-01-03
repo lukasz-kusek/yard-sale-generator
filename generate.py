@@ -5,6 +5,21 @@ import chevron
 source_dir = '../yard-sale'
 destination_dir = '../yard-sale-html'
 
+
+def read_price(item_dir):
+    if os.path.isfile(item_dir + "/Cena_exports/Cena.txt"):
+        with open(item_dir + "/Cena_exports/Cena.txt", 'r') as cena_txt:
+            return cena_txt.read().strip()
+    return ""
+
+
+def read_description(item_dir):
+    if os.path.isfile(item_dir + "/Opis_exports/Opis.txt"):
+        with open(item_dir + "/Opis_exports/Opis.txt", 'r') as opis_txt:
+            return opis_txt.readlines()
+    return []
+
+
 if os.path.isdir(destination_dir):
     for content in os.listdir(destination_dir):
         if not content.startswith(".") and os.path.isdir(destination_dir + "/" + content):
@@ -24,31 +39,28 @@ for item in sorted(items):
     details = os.listdir(source_dir + "/" + item)
     photos = []
     for detail in sorted(details):
-        if detail.endswith(".jpg"):
+        if detail.lower().endswith(".jpg"):
             print(source_dir + "/" + item + "/" + detail)
             copyfile(source_dir + "/" + item + "/" + detail, destination_dir + "/" + item + "/" + detail)
             photos.append(item + "/" + detail)
 
-    if os.path.isfile(source_dir + "/" + item + "/Opis_exports/Opis.txt") and os.path.isfile(source_dir + "/" + item + "/Cena_exports/Cena.txt"):
+    if len(photos) > 0:
         with open('item.html.mustache', 'r') as item_html_template:
             with open(destination_dir + '/' + item + '.html', 'w') as item_html:
-                with open(source_dir + "/" + item + "/Opis_exports/Opis.txt", 'r') as opis_txt:
-                    with open(source_dir + "/" + item + "/Cena_exports/Cena.txt", 'r') as cena_txt:
-                        cena = cena_txt.read().strip()
-                        html = chevron.render(item_html_template, {
-                            'name': item,
-                            'price': cena,
-                            'description': opis_txt.readlines(),
-                            'photos': photos})
+                price = read_price(source_dir + "/" + item)
+                description = read_description(source_dir + "/" + item)
+                html = chevron.render(item_html_template, {
+                    'name': item,
+                    'price': price,
+                    'description': description,
+                    'photos': photos})
 
-                        items_with_details.append({
-                            'name': item,
-                            'price': cena,
-                            'photo': photos[0]
-                        })
+                items_with_details.append({
+                    'name': item,
+                    'price': price,
+                    'photo': photos[0]
+                })
 
-                        cena_txt.close()
-                    opis_txt.close()
                 item_html.write(html)
                 item_html.close()
             item_html_template.close()
